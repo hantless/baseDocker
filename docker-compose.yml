@@ -1,0 +1,49 @@
+version: '2'
+services:
+  app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    image: myapps/app
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - sdnet
+  node:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    image: myapps/node
+    volumes:
+      - .:/var/www/html
+    networks:
+      - sdnet
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "33060:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootsecretpassword"
+      MYSQL_DATABSE: "awesomeproject"
+      MYSQL_USER: "awesomeuser"
+      MYSQL_PASSWORD: "usersecretpassword"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - sdnet
+  redis:
+    image: redis:alpine
+    volumes:
+      - redisdata:/data
+    networks:
+      - sdnet
+networks:
+  sdnet:
+    driver: "bridge"
+volumes:
+  mysqldata:
+    driver: "local"
+  redisdata:
+    driver: "local"
